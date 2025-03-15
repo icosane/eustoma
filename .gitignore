@@ -1,0 +1,9 @@
+﻿---help apps
+config
+lib
+resource/__pycache__
+basic_transcriber_ui_test3-c-1.py
+icon about.txt
+save_audio_before.py
+save_audio_before-tr.py
+models
