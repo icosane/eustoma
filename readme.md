@@ -55,7 +55,7 @@ main/
 ├── Eustoma.exe
 ```
 
-### Usage
+## Usage
 
 1. When launching the app for the first time, go to Settings and download the model you want to use.
 2. If you have an NVIDIA GPU (you can check at the top of the Settings), set Device to ```cuda```.
@@ -63,7 +63,7 @@ main/
 4. You can copy the transcribed text to the clipboard or save it as a .txt file using the buttons next to the Settings button.
 
 
-### Acknowledgments
+## Acknowledgments
 
 - [faster-whisper](https://github.com/SYSTRAN/faster-whisper)
 - [QFluentWidgets](https://github.com/zhiyiYo/PyQt-Fluent-Widgets)
@@ -76,7 +76,7 @@ main/
 - [PyInstaller](https://pyinstaller.org/)
 - [flower icons](https://www.flaticon.com/free-icons/flower) - Flower icons created by Triberion - Flaticon
 
-### Screenshots
+## Screenshots
 <div style="display: flex; flex-direction: column;">
     <img src="./assets/1.png" alt="ui" style="margin-right: 10px;" />
     <img src="./assets/2.png" alt="ui" style="margin-right: 10px;"/>
