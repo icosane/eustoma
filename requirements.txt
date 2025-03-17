@@ -7,3 +7,6 @@ PyQt6-Fluent-Widgets[full]==1.7.5
 PyQt6==6.8.1
 GPUtil==1.4.0
 psutil==7.0.0
+nvidia-cuda-runtime-cu12==12.6.77,
+nvidia-cublas-cu12==12.6.4.1,
+nvidia-cudnn-cu12==9.5.1.17

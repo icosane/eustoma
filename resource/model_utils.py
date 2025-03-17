@@ -1,7 +1,7 @@
 from PyQt6.QtCore import QThread, pyqtSignal
 import os
 from faster_whisper import download_model
-from config import cfg
+from resource.config import cfg
 
 class ModelDownloaderThread(QThread):
     download_finished = pyqtSignal(str)

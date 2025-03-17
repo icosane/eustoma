@@ -2,15 +2,15 @@ import sys, os
 from PyQt6.QtGui import QFont, QColor, QIcon
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QStackedWidget, QFileDialog
 from PyQt6.QtCore import Qt, QObject, pyqtSignal, QThread, QMutex, pyqtSlot, QTranslator, QCoreApplication, QTimer
-from qfluentwidgets import TextBrowser, Theme, setThemeColor, ToolButton, TransparentToolButton, FluentIcon, HyperlinkCard, PushSettingCard, ComboBoxSettingCard, SubtitleLabel, OptionsSettingCard, isDarkTheme, InfoBar, InfoBarPosition, ToolTipFilter, ToolTipPosition, SettingCard, MessageBox, FluentTranslator, IndeterminateProgressBar
+sys.stdout = open(os.devnull, 'w')
+from qfluentwidgets import TextBrowser, setThemeColor, ToolButton, TransparentToolButton, FluentIcon, HyperlinkCard, PushSettingCard, ComboBoxSettingCard, SubtitleLabel, OptionsSettingCard, isDarkTheme, InfoBar, InfoBarPosition, ToolTipFilter, ToolTipPosition, SettingCard, MessageBox, FluentTranslator, IndeterminateProgressBar
 from winrt.windows.ui.viewmanagement import UISettings, UIColorType
 import pyaudio
 import time
 import numpy as np
 base_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(base_dir, 'resource'))
-from config import cfg
-from model_utils import update_model
+from resource.config import cfg
+from resource.model_utils import update_model
 import GPUtil
 import gc
 import shutil
@@ -20,8 +20,31 @@ from faster_whisper import WhisperModel
 import wave
 import tempfile
 
-dll_directory = os.path.join(os.path.dirname(__file__), 'lib')
-os.environ['PATH'] = dll_directory + os.pathsep + os.environ['PATH']
+def get_nvidia_lib_paths():
+    if getattr(sys, 'frozen', False):  # Running inside PyInstaller
+        base_dir = os.path.join(sys.prefix)
+        print(base_dir)
+    else:  # Running inside a virtual environment
+        base_dir = os.path.join(sys.prefix, "Lib", "site-packages")
+
+    nvidia_base_libs = os.path.join(base_dir, "nvidia")
+    cuda_libs = os.path.join(nvidia_base_libs, "cuda_runtime", "bin")
+    cublas_libs = os.path.join(nvidia_base_libs, "cublas", "bin")
+    cudnn_libs = os.path.join(nvidia_base_libs, "cudnn", "bin")
+
+    return [cuda_libs, cublas_libs, cudnn_libs]
+
+
+for dll_path in get_nvidia_lib_paths():
+    if os.path.exists(dll_path):
+        os.environ["PATH"] = dll_path + os.pathsep + os.environ["PATH"]
+
+if getattr(sys, 'frozen', False):
+    # Running as a PyInstaller bundle
+    base_dir = os.path.dirname(sys.executable)  # Points to build/
+else:
+    # Running as a script
+    base_dir = os.path.dirname(os.path.abspath(__file__))
 
 if os.name == 'nt':
     import ctypes
@@ -52,8 +75,6 @@ class ErrorHandler(object):
         error_box.buttonLayout.insertStretch(1)
         error_box.exec()
 
-        # Optional: Log the error to a file or other output
-        #sys.__excepthook__(exctype, value, tb)
 
 class ModelLoader(QThread):
     model_loaded = pyqtSignal(object, str)
@@ -193,7 +214,7 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setWindowTitle(QCoreApplication.translate("MainWindow", "Eustoma"))
-        self.setWindowIcon(QIcon("./resource/assets/icon.png"))
+        self.setWindowIcon(QIcon(os.path.join(base_dir, "resource", "assets", "icon.ico")))
         self.setup_theme()
         self.setGeometry(100, 100, 1370, 770)
         self.setMinimumSize(600, 480)
@@ -220,9 +241,9 @@ class MainWindow(QMainWindow):
         QTimer.singleShot(100, self.init_check)
 
     def init_check(self):
-        model_path = os.path.join(base_dir, "models", f"models--Systran--faster-whisper-{cfg.get(cfg.model).value}")
+        model_path = os.path.abspath(os.path.join(base_dir, "models", f"models--Systran--faster-whisper-{cfg.get(cfg.model).value}"))
         if not os.path.exists(model_path):
-            model_path = os.path.join(base_dir, "models", f"models--mobiuslabsgmbh--faster-whisper-{cfg.get(cfg.model).value}")
+            model_path = os.path.abspath(os.path.join(base_dir, "models", f"models--mobiuslabsgmbh--faster-whisper-{cfg.get(cfg.model).value}"))
         if not (os.path.exists(model_path) and (cfg.get(cfg.model).value != 'None')):
             cfg.set(cfg.model, 'None')
 
@@ -706,7 +727,6 @@ class MainWindow(QMainWindow):
             self.text_browser.setPlaceholderText(QCoreApplication.translate("MainWindow", "Audio saved, starting transcription..."))
             time.sleep(0.5)
             self.load_model()
-            #self.transcribe_audio(self.temp_filename)
 
 
 
@@ -716,7 +736,8 @@ if __name__ == "__main__":
     locale = cfg.get(cfg.language).value
     fluentTranslator = FluentTranslator(locale)
     appTranslator = QTranslator()
-    appTranslator.load(locale, "lang", ".", "resource/lang")
+    lang_path = os.path.join(base_dir, "resource", "lang")
+    appTranslator.load(locale, "lang", ".", lang_path)
 
     app.installTranslator(fluentTranslator)
     app.installTranslator(appTranslator)
@@ -724,4 +745,7 @@ if __name__ == "__main__":
     window = MainWindow()
     window.show()
     sys.excepthook = ErrorHandler()
+    f = open(os.devnull, 'w')
+    sys.stdout = f
+    sys.stderr = f
     sys.exit(app.exec())

@@ -1,12 +1,13 @@
 # -*- mode: python ; coding: utf-8 -*-
-
+from PyInstaller.utils.hooks import collect_dynamic_libs
+cuda_binaries = collect_dynamic_libs('nvidia')
 
 a = Analysis(
-    ['main.py', './resource/config.py', './resource/model_utils.py' ],
+    ['main.py', './resource/config.py', './resource/model_utils.py'],
     pathex=['.\\.venv\\Lib\\site-packages'],
-    binaries=[],
-    datas=[('assets','assets'),('resource','resource'),('lib','lib')],
-    hiddenimports=[],
+    binaries=cuda_binaries,
+    datas=[],
+    hiddenimports=['PyQt6', 'winrt.windows.ui.viewmanagement', 'qfluentwidgets', 'pyaudio', 'numpy', 'faster_whisper', 'nvidia.cuda_runtime-cu12', 'nvidia.cublas-cu12', 'nvidia.cudnn-cu12'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -27,8 +28,8 @@ exe = EXE(
     strip=False,
     upx=True,
     console=False,
-    manifest='dpi_aware.manifest',
-    icon=None,
+    manifest=None,
+    icon='./resource/assets/icon.ico',
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
