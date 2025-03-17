@@ -69,7 +69,6 @@ class ErrorHandler(object):
             error_message = (f"Type: {exctype.__name__}\n"
                              f"Message: {value}")
 
-        # Create a MessageBox to display the error
         error_box = MessageBox("Error", error_message, parent=window)
         error_box.cancelButton.hide()
         error_box.buttonLayout.insertStretch(1)
@@ -107,7 +106,7 @@ class AudioStreamHandler(QObject):
         super().__init__()
         self.p = pyaudio.PyAudio()
         self.stream = None
-        self.stream_lock = QMutex()  # Use QMutex instead of threading.Lock()
+        self.stream_lock = QMutex()
         self.recording = False
         self.audio_source = "mic"
         self.audio_buffer = []
@@ -116,7 +115,7 @@ class AudioStreamHandler(QObject):
         try:
             device_index = 0 if source == "mic" else 1
 
-            self.stream_lock.lock()  # Lock the mutex
+            self.stream_lock.lock()
             if self.stream is not None:
                 self.stream.stop_stream()
                 self.stream.close()
@@ -132,7 +131,7 @@ class AudioStreamHandler(QObject):
             error_box.cancelButton.hide()
             error_box.buttonLayout.insertStretch(1)
         finally:
-            self.stream_lock.unlock()  # Unlock the mutex
+            self.stream_lock.unlock()
 
     def start_recording(self):
         self.recording = True
@@ -150,7 +149,7 @@ class AudioStreamHandler(QObject):
         if self.stream is None:
             return None
         try:
-            self.stream_lock.lock()  # Lock the mutex
+            self.stream_lock.lock()
             audio_data = self.stream.read(1024)
         except Exception as e:
             error_box = MessageBox("Error", f"Error reading audio data: {e}", parent=window)
@@ -158,7 +157,7 @@ class AudioStreamHandler(QObject):
             error_box.buttonLayout.insertStretch(1)
             return None
         finally:
-            self.stream_lock.unlock()  # Unlock the mutex
+            self.stream_lock.unlock()
         return audio_data
 
 
@@ -176,7 +175,7 @@ class AudioThread(QThread):
                 audio_data = self.audio_handler.read_audio_data()
                 if audio_data is not None:
                     self.audio_handler.audio_buffer.append(audio_data)
-            self.msleep(33)  # Approximately 30 FPS update
+            self.msleep(33)
 
     def stop(self):
         self.running = False
@@ -264,15 +263,14 @@ class MainWindow(QMainWindow):
         # Create the main layout
         main_layout = QVBoxLayout()
 
-        # Create the text browser
         self.text_browser = TextBrowser()
         font = QFont()
-        font.setPointSize(14)  # Set the desired font size
+        font.setPointSize(14)
         self.text_browser.setFont(font)
         self.text_browser.setPlaceholderText(QCoreApplication.translate("MainWindow", "Waiting for input. To start press the play button."))
         main_layout.addWidget(self.text_browser)
 
-        # Create the record button and settings button
+        # Create left buttons
         self.record_button = ToolButton(FluentIcon.PLAY)
         self.record_button.setFixedSize(50, 50)
         self.settings_button = TransparentToolButton(FluentIcon.SETTING)
@@ -300,7 +298,7 @@ class MainWindow(QMainWindow):
         self.save_button.clicked.connect(self.save_to_file)
         self.clear_button.clicked.connect(self.clear_browser)
 
-        # Create a layout for the settings button and adjust its vertical position
+        # Create a layout for the left buttons
         settings_layout = QHBoxLayout()
         settings_layout.addWidget(self.settings_button, alignment=Qt.AlignmentFlag.AlignBottom)
         settings_layout.addWidget(self.copy_button, alignment=Qt.AlignmentFlag.AlignBottom)
@@ -330,11 +328,9 @@ class MainWindow(QMainWindow):
         back_button = TransparentToolButton(FluentIcon.LEFT_ARROW)
         back_button.clicked.connect(self.show_main_page)
 
-        # Add the back button to the horizontal layout
         back_button_layout.addWidget(back_button, alignment=Qt.AlignmentFlag.AlignTop)
         back_button_layout.setContentsMargins(5, 5, 5, 5)
 
-        # Add the back button layout to the settings layout
         settings_layout.addLayout(back_button_layout)
 
         self.settings_title = SubtitleLabel(QCoreApplication.translate("MainWindow", "Settings"))
@@ -342,7 +338,6 @@ class MainWindow(QMainWindow):
 
         back_button_layout.addWidget(self.settings_title, alignment=Qt.AlignmentFlag.AlignTop)
 
-        # Add more settings widgets here as needed
         card_layout = QVBoxLayout()
         self.card_device = SettingCard(
             icon=FluentIcon.DEVELOPER_TOOLS,
@@ -368,7 +363,6 @@ class MainWindow(QMainWindow):
             title=QCoreApplication.translate("MainWindow","Model"),
             content=QCoreApplication.translate("MainWindow", "Change whisper model"),
             texts=['None', 'tiny.en', 'tiny', 'base.en', 'base', 'small.en', 'small', 'medium.en', 'medium', 'large-v1', 'large-v2', 'large-v3', 'large', 'large-v3-turbo']
-            #texts=['None', 'tiny.en', 'tiny', 'base.en', 'base', 'small.en', 'small', 'medium.en', 'medium', 'large-v1', 'large-v2', 'large-v3', 'large', 'distil-large-v2', 'distil-medium.en', 'distil-small.en', 'distil-large-v3', 'large-v3-turbo', 'turbo']
         )
 
         card_layout.addWidget(self.card_setmodel, alignment=Qt.AlignmentFlag.AlignTop)
@@ -422,8 +416,6 @@ class MainWindow(QMainWindow):
         settings_layout.addLayout(card_layout)
         card_layout.addStretch()
 
-
-        # Create a widget for the settings layout and add it to the stacked widget
         settings_widget = QWidget()
         settings_widget.setLayout(settings_layout)
         self.stacked_widget.addWidget(settings_widget)
@@ -435,16 +427,12 @@ class MainWindow(QMainWindow):
         self.stacked_widget.setCurrentIndex(0)  # Switch back to the main page
 
     def center(self):
-        # Get the screen's available geometry
         screen_geometry = self.screen().availableGeometry()
-        # Get the window's geometry
         window_geometry = self.geometry()
 
-        # Calculate the center position
         x = (screen_geometry.width() - window_geometry.width()) // 2
         y = (screen_geometry.height() - window_geometry.height()) // 2
 
-        # Move the window to the center position
         self.move(x, y)
 
     def update_theme(self):
@@ -526,12 +514,12 @@ class MainWindow(QMainWindow):
     def update_record_button(self, enabled):
         if hasattr(self, 'record_button'):
             self.record_button.setEnabled(enabled)
-            self.record_button.repaint()  # Force UI update if needed
+            self.record_button.repaint()
 
     def update_remove_button(self, enabled):
         if hasattr(self, 'card_deletemodel'):
             self.card_deletemodel.button.setEnabled(enabled)
-            self.record_button.repaint()  # Force UI update if needed
+            self.record_button.repaint()
 
     def clear_browser(self):
         self.text_browser.clear()
@@ -550,7 +538,6 @@ class MainWindow(QMainWindow):
 
     def setup_theme(self):
         main_color_hex = self.get_main_color_hex()
-        #theme = Theme.LIGHT if isDarkTheme() else Theme.DARK
         setThemeColor(main_color_hex)
         if isDarkTheme():
             self.setStyleSheet("""
@@ -574,10 +561,8 @@ class MainWindow(QMainWindow):
         self.text_browser.setPlainText(data)
 
     def copy_to_clipboard(self):
-        # Get the text from the QTextBrowser
         text = self.text_browser.toPlainText()
 
-        # Check if the text is empty
         if not text.strip():
             InfoBar.warning(
                 title=(QCoreApplication.translate("MainWindow", "Warning")),
@@ -590,11 +575,9 @@ class MainWindow(QMainWindow):
             )
             return
 
-        # Copy the text to the clipboard
         clipboard = QApplication.clipboard()
         clipboard.setText(text)
 
-        # Optionally, show a message box to confirm the action
         InfoBar.success(
             title=(QCoreApplication.translate("MainWindow", "Success")),
             content=(QCoreApplication.translate("MainWindow", "Text copied to clipboard!")),
@@ -606,10 +589,8 @@ class MainWindow(QMainWindow):
         )
 
     def save_to_file(self):
-        # Get the text from the QTextBrowser
         text = self.text_browser.toPlainText()
 
-        # Check if the text is empty
         if not text.strip():
             InfoBar.warning(
                 title=(QCoreApplication.translate("MainWindow", "Warning")),
@@ -622,7 +603,6 @@ class MainWindow(QMainWindow):
             )
             return
 
-        # Open a "Save As" dialog to get the file path
         file_path, _ = QFileDialog.getSaveFileName(
             self,
             QCoreApplication.translate("MainWindow", "Save File"),
@@ -630,11 +610,9 @@ class MainWindow(QMainWindow):
             QCoreApplication.translate("MainWindow", "Text Files (*.txt)")
         )
 
-        # Check if a file path was selected
         if not file_path:
             return
 
-        # Save the text to the file
         try:
             with open(file_path, "w") as file:
                 file.write(text)
