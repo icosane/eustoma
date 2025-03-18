@@ -2,14 +2,16 @@
 
 Yet another speech-to-text app, powered by faster-whisper and QFluentWidgets. 
 
+It was developed specifically for a family member, and as such, it is provided as-is. Please note that the project may not receive any new features or fixes in the future.
+
 ## Features
 
-- **Choose your model**: Support for different speech recognition models via faster-whisper
+- **Model Selection**: Support for various speech recognition models via  faster-whisper
 - **Modern UI**: Built with PyQt and QFluentWidgets for a modern look and feel
-- **GPU support**: Runs on NVIDIA GPU or any CPU (for smaller models)
-- **Copy to clipboard**: Copy transcribed text to the clipboard with a single click
-- **Save to file**: Save transcribed text as .txt
-- **Fully Local**: The application runs completely offline after downloading whisper model.
+- **GPU support**: Compatible with NVIDIA GPUs and can also run on any CPU (for smaller models).
+- **Copy to clipboard**: Easily copy transcribed text to the clipboard with a single click.
+- **Save to file**: Save transcribed text as a .txt file.
+- **Fully Local**: The application operates completely offline after downloading the whisper model.
 
 
 ## Getting Started
@@ -51,10 +53,10 @@ Or open the extracted folder in [Visual Studio Code](https://code.visualstudio.c
 
 ## Usage
 
-1. When launching the app for the first time, go to Settings and download the model you want to use.
-2. If you have an NVIDIA GPU (you can check at the top of the Settings), set Device to ```cuda```.
-3. On the main screen, press the Play button to start recording, and press again to stop and transcribe.
-4. You can copy the transcribed text to the clipboard or save it as a .txt file using the buttons next to the Settings button.
+1. **First Launch**: When you launch the app for the first time, navigate to the Settings and download the model you wish to use.
+2. **Device Configuration**: If you have an NVIDIA GPU (you can verify this at the top of the **Settings**), set the Device option to ```cuda```.
+3. **Recording**: On the main screen, press the **Play** button to start recording. Press it again to stop recording and transcribe the audio.
+4. **Text Management**: You can copy the transcribed text to the clipboard or save it as a .txt file using the buttons located next to the **Settings** button.
 
 ### Keyboard Shortcuts
 - ```Ctrl + C``` to copy to clipboard
@@ -74,7 +76,7 @@ Or open the extracted folder in [Visual Studio Code](https://code.visualstudio.c
 - [psutil](https://github.com/giampaolo/psutil)
 - [GPUtil](https://github.com/anderskm/gputil)
 - [PyInstaller](https://pyinstaller.org/)
-- [flower icons](https://www.flaticon.com/free-icons/flower) - Flower icons created by Triberion - Flaticon
+- [flower icons](https://www.flaticon.com/free-icon/jasmine_2926745) - Flower icons created by Triberion - Flaticon
 
 ## Screenshots
 <div style="display: flex; flex-direction: column;">
