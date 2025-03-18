@@ -59,7 +59,7 @@ Or open the extracted folder in [Visual Studio Code](https://code.visualstudio.c
 4. **Text Management**: You can copy the transcribed text to the clipboard or save it as a .txt file using the buttons located next to the **Settings** button.
 
 ### Keyboard Shortcuts
-- ```Ctrl + C``` to copy to clipboard
+- ```Ctrl + Shift + C``` to copy to clipboard
 - ```Ctrl + S``` to save to file
 - ```Delete``` to clear text field
 - ```Spacebar``` to start/stop recording
