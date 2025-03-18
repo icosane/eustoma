@@ -47,13 +47,7 @@ Or open the extracted folder in [Visual Studio Code](https://code.visualstudio.c
 1. Install PyInstaller in your .venv:
 ```pip install pyinstaller```
 2. Run ```pyinstaller build.spec```
-3. Locate the ```./dist/main/``` folder. Copy the resources folder there so that the final tree looks like this:
-```
-main/
-├── _internal/
-├── resource/
-├── Eustoma.exe
-```
+
 
 ## Usage
 
@@ -61,6 +55,12 @@ main/
 2. If you have an NVIDIA GPU (you can check at the top of the Settings), set Device to ```cuda```.
 3. On the main screen, press the Play button to start recording, and press again to stop and transcribe.
 4. You can copy the transcribed text to the clipboard or save it as a .txt file using the buttons next to the Settings button.
+
+### Keyboard Shortcuts
+- ```Ctrl + C``` to copy to clipboard
+- ```Ctrl + S``` to save to file
+- ```Delete``` to clear text field
+- ```Spacebar``` to start/stop recording
 
 
 ## Acknowledgments

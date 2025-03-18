@@ -6,7 +6,7 @@ a = Analysis(
     ['main.py', './resource/config.py', './resource/model_utils.py'],
     pathex=['.\\.venv\\Lib\\site-packages'],
     binaries=cuda_binaries,
-    datas=[],
+    datas=[('resource','resource')],
     hiddenimports=['PyQt6', 'winrt.windows.ui.viewmanagement', 'qfluentwidgets', 'pyaudio', 'numpy', 'faster_whisper', 'nvidia.cuda_runtime-cu12', 'nvidia.cublas-cu12', 'nvidia.cudnn-cu12'],
     hookspath=[],
     hooksconfig={},

@@ -1,5 +1,5 @@
 import sys, os
-from PyQt6.QtGui import QFont, QColor, QIcon
+from PyQt6.QtGui import QFont, QColor, QIcon, QShortcut, QKeySequence
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QStackedWidget, QFileDialog
 from PyQt6.QtCore import Qt, QObject, pyqtSignal, QThread, QMutex, pyqtSlot, QTranslator, QCoreApplication, QTimer
 sys.stdout = open(os.devnull, 'w')
@@ -8,7 +8,6 @@ from winrt.windows.ui.viewmanagement import UISettings, UIColorType
 import pyaudio
 import time
 import numpy as np
-base_dir = os.path.dirname(os.path.abspath(__file__))
 from resource.config import cfg
 from resource.model_utils import update_model
 import GPUtil
@@ -23,7 +22,6 @@ import tempfile
 def get_nvidia_lib_paths():
     if getattr(sys, 'frozen', False):  # Running inside PyInstaller
         base_dir = os.path.join(sys.prefix)
-        print(base_dir)
     else:  # Running inside a virtual environment
         base_dir = os.path.join(sys.prefix, "Lib", "site-packages")
 
@@ -42,9 +40,11 @@ for dll_path in get_nvidia_lib_paths():
 if getattr(sys, 'frozen', False):
     # Running as a PyInstaller bundle
     base_dir = os.path.dirname(sys.executable)  # Points to build/
+    res_dir = os.path.join(sys.prefix)
 else:
     # Running as a script
     base_dir = os.path.dirname(os.path.abspath(__file__))
+    res_dir = base_dir
 
 if os.name == 'nt':
     import ctypes
@@ -213,7 +213,7 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setWindowTitle(QCoreApplication.translate("MainWindow", "Eustoma"))
-        self.setWindowIcon(QIcon(os.path.join(base_dir, "resource", "assets", "icon.ico")))
+        self.setWindowIcon(QIcon(os.path.join(res_dir, "resource", "assets", "icon.ico")))
         self.setup_theme()
         self.setGeometry(100, 100, 1370, 770)
         self.setMinimumSize(600, 480)
@@ -297,6 +297,16 @@ class MainWindow(QMainWindow):
         self.copy_button.clicked.connect(self.copy_to_clipboard)
         self.save_button.clicked.connect(self.save_to_file)
         self.clear_button.clicked.connect(self.clear_browser)
+
+        # Key shortcuts
+        self.record_action = QShortcut(QKeySequence("Space"), self)
+        self.record_action.activated.connect(self.toggle_recording)
+        self.copy_action = QShortcut(QKeySequence("Ctrl+C"), self)
+        self.copy_action.activated.connect(self.copy_to_clipboard)
+        self.save_action = QShortcut(QKeySequence("Ctrl+S"), self)
+        self.save_action.activated.connect(self.save_to_file)
+        self.clear_action = QShortcut(QKeySequence("Delete"), self)
+        self.clear_action.activated.connect(self.clear_browser)
 
         # Create a layout for the left buttons
         settings_layout = QHBoxLayout()
@@ -614,7 +624,7 @@ class MainWindow(QMainWindow):
             return
 
         try:
-            with open(file_path, "w") as file:
+            with open(file_path, "w", encoding='utf-8') as file:
                 file.write(text)
             InfoBar.success(
                 title=(QCoreApplication.translate("MainWindow", "Success")),
@@ -640,7 +650,7 @@ class MainWindow(QMainWindow):
         self.audio_thread.stop()
         super().closeEvent(event)
 
-    def toggle_recording(self, e):
+    def toggle_recording(self):
         self.audio_handler.recording = not self.audio_handler.recording
         if self.audio_handler.recording:
             self.text_browser.clear()
@@ -714,7 +724,7 @@ if __name__ == "__main__":
     locale = cfg.get(cfg.language).value
     fluentTranslator = FluentTranslator(locale)
     appTranslator = QTranslator()
-    lang_path = os.path.join(base_dir, "resource", "lang")
+    lang_path = os.path.join(res_dir, "resource", "lang")
     appTranslator.load(locale, "lang", ".", lang_path)
 
     app.installTranslator(fluentTranslator)
