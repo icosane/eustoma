@@ -3,7 +3,7 @@ from enum import Enum
 from PyQt6.QtCore import QLocale
 from faster_whisper import available_models
 from qfluentwidgets import (qconfig, QConfig, OptionsConfigItem, Theme,
-                            OptionsValidator, EnumSerializer, ConfigSerializer)
+                            OptionsValidator, EnumSerializer, ConfigSerializer, ConfigItem, BoolValidator)
 
 class Language(Enum):
     """ Language enumeration """
@@ -75,6 +75,7 @@ class Config(QConfig):
         "MainWindow", "model", Model.NONE, OptionsValidator(Model), ModelSerializer(), restart=False)
     device = OptionsConfigItem(
         "MainWindow", "device", Device.CPU, OptionsValidator(Device), DeviceSerializer(), restart=False)
+    lineformat = ConfigItem("MainWindow", "lineformat", False, BoolValidator())
 
 
 cfg = Config()

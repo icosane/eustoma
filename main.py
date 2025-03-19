@@ -3,13 +3,13 @@ from PyQt6.QtGui import QFont, QColor, QIcon, QShortcut, QKeySequence
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QStackedWidget, QFileDialog
 from PyQt6.QtCore import Qt, QObject, pyqtSignal, QThread, QMutex, pyqtSlot, QTranslator, QCoreApplication, QTimer
 sys.stdout = open(os.devnull, 'w')
-from qfluentwidgets import TextBrowser, setThemeColor, ToolButton, TransparentToolButton, FluentIcon, HyperlinkCard, PushSettingCard, ComboBoxSettingCard, SubtitleLabel, OptionsSettingCard, isDarkTheme, InfoBar, InfoBarPosition, ToolTipFilter, ToolTipPosition, SettingCard, MessageBox, FluentTranslator, IndeterminateProgressBar
+from qfluentwidgets import TextBrowser, setThemeColor, ToolButton, TransparentToolButton, FluentIcon, HyperlinkCard, PushSettingCard, ComboBoxSettingCard, SubtitleLabel, OptionsSettingCard, isDarkTheme, InfoBar, InfoBarPosition, ToolTipFilter, ToolTipPosition, SettingCard, MessageBox, FluentTranslator, IndeterminateProgressBar, SwitchSettingCard
 from winrt.windows.ui.viewmanagement import UISettings, UIColorType
 import pyaudio
 import time
 import numpy as np
 from resource.config import cfg
-from resource.model_utils import update_model
+from resource.model_utils import update_model, update_device
 import GPUtil
 import gc
 import shutil
@@ -18,6 +18,7 @@ import psutil
 from faster_whisper import WhisperModel
 import wave
 import tempfile
+from ctranslate2 import get_cuda_device_count
 
 def get_nvidia_lib_paths():
     if getattr(sys, 'frozen', False):  # Running inside PyInstaller
@@ -193,7 +194,11 @@ class TranscriptionWorker(QThread):
     def run(self):
         try:
             segments, _ = self.model.transcribe(self.audio_file)
-            transcription = "\n".join([segment.text for segment in segments])
+
+            if (cfg.get(cfg.lineformat) is False):
+                transcription = "\n".join([segment.text for segment in segments])
+            else:
+                transcription = "".join([segment.text for segment in segments])
 
             self.transcription_done.emit(transcription)
 
@@ -209,6 +214,7 @@ class TranscriptionWorker(QThread):
 class MainWindow(QMainWindow):
     theme_changed = pyqtSignal()
     model_changed = pyqtSignal()
+    device_changed = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -226,8 +232,9 @@ class MainWindow(QMainWindow):
 
         self.theme_changed.connect(self.update_theme)
         self.model_changed.connect(lambda: update_model(self))
+        self.device_changed.connect(lambda: update_device(self))
 
-        self.audio_thread.start()
+        QTimer.singleShot(500, self.audio_thread.start)
         self.audio_handler.recording_finished.connect(self.save_audio)
 
         self.stacked_widget = QStackedWidget()
@@ -258,6 +265,18 @@ class MainWindow(QMainWindow):
             )
             self.record_button.setDisabled(True)
             self.card_deletemodel.button.setDisabled(True)
+
+        if (get_cuda_device_count() == 0) and ((cfg.get(cfg.device).value == 'cuda')):
+            InfoBar.info(
+                title=(QCoreApplication.translate("MainWindow", "Information")),
+                content=(QCoreApplication.translate("MainWindow", "<b>Your device does not have an NVIDIA graphics card</b>. Please go to Settings and switch the device to <b>cpu</b>.")),
+                orient=Qt.Orientation.Horizontal,
+                isClosable=False,
+                position=InfoBarPosition.BOTTOM,
+                duration=4000,
+                parent=window
+            )
+            self.record_button.setDisabled(True)
 
     def layout_main(self):
         # Create the main layout
@@ -366,6 +385,7 @@ class MainWindow(QMainWindow):
         )
 
         card_layout.addWidget(self.card_setdevice, alignment=Qt.AlignmentFlag.AlignTop)
+        cfg.model.valueChanged.connect(self.device_changed.emit)
 
         self.card_setmodel = ComboBoxSettingCard(
             configItem=cfg.model,
@@ -387,6 +407,15 @@ class MainWindow(QMainWindow):
 
         card_layout.addWidget(self.card_deletemodel, alignment=Qt.AlignmentFlag.AlignTop)
         self.card_deletemodel.clicked.connect(self.modelremover)
+
+        self.card_switch_line_format = SwitchSettingCard(
+            icon=FluentIcon.FONT_SIZE,
+            title=QCoreApplication.translate("MainWindow","Continuous text"),
+            content=QCoreApplication.translate("MainWindow","Click to switch between separate lines for each sentence and a continuous flow of text."),
+            configItem=cfg.lineformat
+        )
+
+        card_layout.addWidget(self.card_switch_line_format, alignment=Qt.AlignmentFlag.AlignTop)
 
         self.card_setlanguage = ComboBoxSettingCard(
             configItem=cfg.language,
