@@ -221,8 +221,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(QCoreApplication.translate("MainWindow", "Eustoma"))
         self.setWindowIcon(QIcon(os.path.join(res_dir, "resource", "assets", "icon.ico")))
         self.setup_theme()
-        self.setGeometry(100, 100, 1370, 770)
-        self.setMinimumSize(600, 480)
+        self.setGeometry(100, 100, 1370, 870)
+        self.setMinimumSize(602, 850)
         self.center()
         self.model = None
         self.model_mutex = QMutex()
