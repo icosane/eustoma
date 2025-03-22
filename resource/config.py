@@ -76,6 +76,7 @@ class Config(QConfig):
     device = OptionsConfigItem(
         "MainWindow", "device", Device.CPU, OptionsValidator(Device), DeviceSerializer(), restart=False)
     lineformat = ConfigItem("MainWindow", "lineformat", False, BoolValidator())
+    saveoutput = ConfigItem("MainWindow", "saveoutput", False, BoolValidator())
 
 
 cfg = Config()

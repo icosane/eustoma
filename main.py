@@ -75,6 +75,18 @@ class ErrorHandler(object):
         error_box.buttonLayout.insertStretch(1)
         error_box.exec()
 
+    def write(self, message):
+        if message.startswith("Error:"):
+            error_box = MessageBox("Error", message, parent=window)
+            error_box.cancelButton.hide()
+            error_box.buttonLayout.insertStretch(1)
+            error_box.exec()
+        else:
+            pass
+
+    def flush(self):
+        pass
+
 
 class ModelLoader(QThread):
     model_loaded = pyqtSignal(object, str)
@@ -102,6 +114,7 @@ class ModelLoader(QThread):
 
 class AudioStreamHandler(QObject):
     recording_finished = pyqtSignal()
+    mic_status = pyqtSignal(bool)
 
     def __init__(self):
         super().__init__()
@@ -111,6 +124,29 @@ class AudioStreamHandler(QObject):
         self.recording = False
         self.audio_source = "mic"
         self.audio_buffer = []
+
+    def mic_connection_check(self):
+        device_found = self._check_device()
+
+        if not device_found:
+            self.p.terminate()
+            self.p = pyaudio.PyAudio()
+            device_found = self._check_device()
+
+        self.mic_status.emit(device_found)
+
+    def _check_device(self):
+        num_devices = self.p.get_device_count()
+        device_found = False
+
+        for i in range(num_devices):
+            device_info = self.p.get_device_info_by_index(i)
+            print(device_info)
+            if device_info.get('name') == 'Microsoft Sound Mapper - Input':
+                device_found = True
+                break
+
+        return device_found
 
     def open_audio_stream(self, source):
         try:
@@ -220,9 +256,8 @@ class MainWindow(QMainWindow):
         super().__init__(parent=parent)
         self.setWindowTitle(QCoreApplication.translate("MainWindow", "Eustoma"))
         self.setWindowIcon(QIcon(os.path.join(res_dir, "resource", "assets", "icon.ico")))
+        self.setGeometry(100,100,1318,720)
         self.setup_theme()
-        self.setGeometry(100, 100, 1370, 870)
-        self.setMinimumSize(602, 850)
         self.center()
         self.model = None
         self.model_mutex = QMutex()
@@ -236,6 +271,7 @@ class MainWindow(QMainWindow):
 
         QTimer.singleShot(500, self.audio_thread.start)
         self.audio_handler.recording_finished.connect(self.save_audio)
+        self.audio_handler.mic_status.connect(self.mic_check)
 
         self.stacked_widget = QStackedWidget()
         self.setCentralWidget(self.stacked_widget)
@@ -245,6 +281,23 @@ class MainWindow(QMainWindow):
         self.layout_settings()
 
         QTimer.singleShot(100, self.init_check)
+
+    def mic_check(self,s):
+        if not s:
+            InfoBar.warning(
+                title=(QCoreApplication.translate("MainWindow", "Warning")),
+                content=(QCoreApplication.translate("MainWindow", "<b>Microphone is not detected</b>. Please check that your microphone is connected and turned on.")),
+                orient=Qt.Orientation.Horizontal,
+                isClosable=False,
+                position=InfoBarPosition.BOTTOM,
+                duration=4000,
+                parent=window
+            )
+            self.record_button.setDisabled(True)
+            self.micstatusupd_button.show()
+        else:
+            self.micstatusupd_button.hide()
+            self.record_button.setEnabled(True)
 
     def init_check(self):
         model_path = os.path.abspath(os.path.join(base_dir, "models", f"models--Systran--faster-whisper-{cfg.get(cfg.model).value}"))
@@ -278,6 +331,8 @@ class MainWindow(QMainWindow):
             )
             self.record_button.setDisabled(True)
 
+        self.audio_handler.mic_connection_check()
+
     def layout_main(self):
         # Create the main layout
         main_layout = QVBoxLayout()
@@ -296,6 +351,7 @@ class MainWindow(QMainWindow):
         self.copy_button = TransparentToolButton(FluentIcon.COPY)
         self.save_button = TransparentToolButton(FluentIcon.SAVE_AS)
         self.clear_button = TransparentToolButton(FluentIcon.BROOM)
+        self.micstatusupd_button = TransparentToolButton(FluentIcon.UPDATE)
 
         #tooltips
         self.copy_button.setToolTip(QCoreApplication.translate("MainWindow", "Copy to clipboard"))
@@ -310,12 +366,17 @@ class MainWindow(QMainWindow):
         self.clear_button.setToolTipDuration(2000)
         self.clear_button.installEventFilter(ToolTipFilter(self.clear_button, 0, ToolTipPosition.TOP))
 
+        self.micstatusupd_button.setToolTip(QCoreApplication.translate("MainWindow", "Recheck microphone connection"))
+        self.micstatusupd_button.setToolTipDuration(2000)
+        self.micstatusupd_button.installEventFilter(ToolTipFilter(self.micstatusupd_button, 0, ToolTipPosition.TOP))
+
         # Connect button signals
         self.record_button.clicked.connect(self.toggle_recording)
         self.settings_button.clicked.connect(self.show_settings_page)
         self.copy_button.clicked.connect(self.copy_to_clipboard)
         self.save_button.clicked.connect(self.save_to_file)
         self.clear_button.clicked.connect(self.clear_browser)
+        self.micstatusupd_button.clicked.connect(self.updmicstatus)
 
         # Key shortcuts
         self.record_action = QShortcut(QKeySequence("Space"), self)
@@ -333,6 +394,7 @@ class MainWindow(QMainWindow):
         settings_layout.addWidget(self.copy_button, alignment=Qt.AlignmentFlag.AlignBottom)
         settings_layout.addWidget(self.save_button, alignment=Qt.AlignmentFlag.AlignBottom)
         settings_layout.addWidget(self.clear_button, alignment=Qt.AlignmentFlag.AlignBottom)
+        settings_layout.addWidget(self.micstatusupd_button, alignment=Qt.AlignmentFlag.AlignBottom)
 
         bottom_button_layout = QHBoxLayout()
         bottom_button_layout.addLayout(settings_layout)
@@ -416,6 +478,15 @@ class MainWindow(QMainWindow):
         )
 
         card_layout.addWidget(self.card_switch_line_format, alignment=Qt.AlignmentFlag.AlignTop)
+
+        self.card_keep_output = SwitchSettingCard(
+            icon=FluentIcon.FONT,
+            title=QCoreApplication.translate("MainWindow","Keep output text"),
+            content=QCoreApplication.translate("MainWindow","Do not clear the previous transcription"),
+            configItem=cfg.saveoutput
+        )
+
+        card_layout.addWidget(self.card_keep_output, alignment=Qt.AlignmentFlag.AlignTop)
 
         self.card_setlanguage = ComboBoxSettingCard(
             configItem=cfg.language,
@@ -564,6 +635,9 @@ class MainWindow(QMainWindow):
         self.text_browser.clear()
         self.text_browser.setPlaceholderText(QCoreApplication.translate("MainWindow", "Waiting for input. To start press the play button."))
 
+    def updmicstatus(self):
+        QTimer.singleShot(1000, self.audio_handler.mic_connection_check)
+
     def langinfo(self):
         InfoBar.success(
             title=(QCoreApplication.translate("MainWindow", "Success")),
@@ -596,8 +670,14 @@ class MainWindow(QMainWindow):
         return f'#{int((color.r)):02x}{int((color.g)):02x}{int((color.b )):02x}'
 
     def update_audio_text_field(self, data):
-        self.text_browser.clear()
-        self.text_browser.setPlainText(data)
+        if (cfg.get(cfg.saveoutput) is True):
+            if (cfg.get(cfg.lineformat) is True):
+                self.text_browser.setPlainText(self.current_text + data)
+            else:
+                self.text_browser.setPlainText(self.current_text + '\n' + data)
+        else:
+            self.text_browser.clear()
+            self.text_browser.setPlainText(data)
 
     def copy_to_clipboard(self):
         text = self.text_browser.toPlainText()
@@ -682,6 +762,8 @@ class MainWindow(QMainWindow):
     def toggle_recording(self):
         self.audio_handler.recording = not self.audio_handler.recording
         if self.audio_handler.recording:
+            if (cfg.get(cfg.saveoutput) is True):
+                self.current_text = self.text_browser.toPlainText()
             self.text_browser.clear()
             self.text_browser.setPlaceholderText(QCoreApplication.translate("MainWindow", "Recording..."))
             # When starting, ensure stream is open
@@ -762,7 +844,5 @@ if __name__ == "__main__":
     window = MainWindow()
     window.show()
     sys.excepthook = ErrorHandler()
-    f = open(os.devnull, 'w')
-    sys.stdout = f
-    sys.stderr = f
+    sys.stderr = ErrorHandler()
     sys.exit(app.exec())
