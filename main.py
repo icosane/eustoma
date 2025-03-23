@@ -141,7 +141,7 @@ class AudioStreamHandler(QObject):
 
         for i in range(num_devices):
             device_info = self.p.get_device_info_by_index(i)
-            print(device_info)
+
             if device_info.get('name') == 'Microsoft Sound Mapper - Input':
                 device_found = True
                 break
@@ -680,9 +680,11 @@ class MainWindow(QMainWindow):
     def update_audio_text_field(self, data):
         if (cfg.get(cfg.saveoutput) is True):
             if (cfg.get(cfg.lineformat) is True):
-                self.text_browser.setPlainText(self.current_text + data)
+                text = (self.current_text + '\n' + '\n' + data) if self.current_text else data
+                self.text_browser.setPlainText(text)
             else:
-                self.text_browser.setPlainText(self.current_text + '\n' + data)
+                text = (self.current_text + '\n' + data) if self.current_text else data
+                self.text_browser.setPlainText(text)
         else:
             self.text_browser.clear()
             self.text_browser.setPlainText(data)
