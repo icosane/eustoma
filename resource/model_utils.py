@@ -40,10 +40,14 @@ def update_model(main_window):
     if model_name == 'None':
         main_window.update_record_button(False)
         main_window.update_remove_button(False)
+        main_window.settings_badge.show()
+        main_window.show_badge = True
     else:
         model_downloader(main_window)
         main_window.update_record_button(True)
         main_window.update_remove_button(True)
+        main_window.show_badge = False
+        main_window.settings_badge.hide()
 
 def update_device(main_window):
     device = cfg.get(cfg.device).value

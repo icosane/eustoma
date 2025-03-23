@@ -3,7 +3,7 @@ from PyQt6.QtGui import QFont, QColor, QIcon, QShortcut, QKeySequence
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QStackedWidget, QFileDialog
 from PyQt6.QtCore import Qt, QObject, pyqtSignal, QThread, QMutex, pyqtSlot, QTranslator, QCoreApplication, QTimer
 sys.stdout = open(os.devnull, 'w')
-from qfluentwidgets import TextBrowser, setThemeColor, ToolButton, TransparentToolButton, FluentIcon, HyperlinkCard, PushSettingCard, ComboBoxSettingCard, SubtitleLabel, OptionsSettingCard, isDarkTheme, InfoBar, InfoBarPosition, ToolTipFilter, ToolTipPosition, SettingCard, MessageBox, FluentTranslator, IndeterminateProgressBar, SwitchSettingCard
+from qfluentwidgets import TextBrowser, setThemeColor, ToolButton, TransparentToolButton, FluentIcon, HyperlinkCard, PushSettingCard, ComboBoxSettingCard, SubtitleLabel, OptionsSettingCard, isDarkTheme, InfoBar, InfoBarPosition, ToolTipFilter, ToolTipPosition, SettingCard, MessageBox, FluentTranslator, IndeterminateProgressBar, SwitchSettingCard, InfoBadgePosition, DotInfoBadge
 from winrt.windows.ui.viewmanagement import UISettings, UIColorType
 import pyaudio
 import time
@@ -261,6 +261,7 @@ class MainWindow(QMainWindow):
         self.center()
         self.model = None
         self.model_mutex = QMutex()
+        self.show_badge = False
 
         self.audio_handler = AudioStreamHandler()
         self.audio_thread = AudioThread(self.audio_handler)
@@ -275,6 +276,7 @@ class MainWindow(QMainWindow):
 
         self.stacked_widget = QStackedWidget()
         self.setCentralWidget(self.stacked_widget)
+        self.stacked_widget.currentChanged.connect(self.update_badge_visibility)
 
 
         self.layout_main()
@@ -295,6 +297,8 @@ class MainWindow(QMainWindow):
             )
             self.record_button.setDisabled(True)
             self.micstatusupd_button.show()
+        elif ((cfg.get(cfg.model).value == 'None')):
+            self.micstatusupd_button.hide()
         else:
             self.micstatusupd_button.hide()
             self.record_button.setEnabled(True)
@@ -318,6 +322,8 @@ class MainWindow(QMainWindow):
             )
             self.record_button.setDisabled(True)
             self.card_deletemodel.button.setDisabled(True)
+            self.settings_badge.show()
+            self.show_badge = True
 
         if (get_cuda_device_count() == 0) and ((cfg.get(cfg.device).value == 'cuda')):
             InfoBar.info(
@@ -348,6 +354,7 @@ class MainWindow(QMainWindow):
         self.record_button = ToolButton(FluentIcon.PLAY)
         self.record_button.setFixedSize(50, 50)
         self.settings_button = TransparentToolButton(FluentIcon.SETTING)
+        self.settings_badge = DotInfoBadge.error(self, target=self.settings_button, position=InfoBadgePosition.TOP_RIGHT)
         self.copy_button = TransparentToolButton(FluentIcon.COPY)
         self.save_button = TransparentToolButton(FluentIcon.SAVE_AS)
         self.clear_button = TransparentToolButton(FluentIcon.BROOM)
@@ -625,6 +632,7 @@ class MainWindow(QMainWindow):
         if hasattr(self, 'record_button'):
             self.record_button.setEnabled(enabled)
             self.record_button.repaint()
+            self.settings_badge.hide()
 
     def update_remove_button(self, enabled):
         if hasattr(self, 'card_deletemodel'):
@@ -758,6 +766,12 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event):
         self.audio_thread.stop()
         super().closeEvent(event)
+
+    def update_badge_visibility(self, index):
+        if index == 0 and self.show_badge:
+            self.settings_badge.setVisible(True)
+        else:
+            self.settings_badge.setVisible(False)
 
     def toggle_recording(self):
         self.audio_handler.recording = not self.audio_handler.recording
