@@ -388,7 +388,7 @@ class MainWindow(QMainWindow):
         # Key shortcuts
         self.record_action = QShortcut(QKeySequence("Space"), self)
         self.record_action.activated.connect(self.toggle_recording)
-        self.copy_action = QShortcut(QKeySequence("Ctrl+Shift+C"), self)
+        self.copy_action = QShortcut(QKeySequence("Alt+C"), self)
         self.copy_action.activated.connect(self.copy_to_clipboard)
         self.save_action = QShortcut(QKeySequence("Ctrl+S"), self)
         self.save_action.activated.connect(self.save_to_file)
