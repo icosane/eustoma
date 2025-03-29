@@ -257,7 +257,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(QCoreApplication.translate("MainWindow", "Eustoma"))
         self.setWindowIcon(QIcon(os.path.join(res_dir, "resource", "assets", "icon.ico")))
         self.setGeometry(100,100,1318,720)
-        self.setMinimumSize(625, 774)
+        self.setMinimumSize(842, 806)
         self.setup_theme()
         self.center()
         self.model = None
@@ -549,8 +549,6 @@ class MainWindow(QMainWindow):
         self.card_widget = QWidget()
         self.card_widget.setLayout(card_layout)
         self.scroll_area.setWidget(self.card_widget)
-        self.card_widget.setMinimumWidth(625)
-        self.card_widget.setMinimumHeight(774)
         settings_layout.addWidget(self.scroll_area)
 
         self.download_progressbar = IndeterminateProgressBar()
