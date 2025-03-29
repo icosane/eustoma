@@ -549,6 +549,8 @@ class MainWindow(QMainWindow):
         self.card_widget = QWidget()
         self.card_widget.setLayout(card_layout)
         self.scroll_area.setWidget(self.card_widget)
+        self.card_widget.setMinimumWidth(625)
+        self.card_widget.setMinimumHeight(774)
         settings_layout.addWidget(self.scroll_area)
 
         self.download_progressbar = IndeterminateProgressBar()
