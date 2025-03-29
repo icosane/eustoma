@@ -77,6 +77,8 @@ class Config(QConfig):
         "MainWindow", "device", Device.CPU, OptionsValidator(Device), DeviceSerializer(), restart=False)
     lineformat = ConfigItem("MainWindow", "lineformat", False, BoolValidator())
     saveoutput = ConfigItem("MainWindow", "saveoutput", False, BoolValidator())
+    dpiScale = OptionsConfigItem(
+        "MainWindow", "DpiScale", "Auto", OptionsValidator([1, 1.25, 1.5, 1.75, 2, "Auto"]), restart=True)
 
 
 cfg = Config()

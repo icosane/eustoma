@@ -3,7 +3,7 @@ from PyQt6.QtGui import QFont, QColor, QIcon, QShortcut, QKeySequence
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QStackedWidget, QFileDialog
 from PyQt6.QtCore import Qt, QObject, pyqtSignal, QThread, QMutex, pyqtSlot, QTranslator, QCoreApplication, QTimer
 sys.stdout = open(os.devnull, 'w')
-from qfluentwidgets import TextBrowser, setThemeColor, ToolButton, TransparentToolButton, FluentIcon, HyperlinkCard, PushSettingCard, ComboBoxSettingCard, SubtitleLabel, OptionsSettingCard, isDarkTheme, InfoBar, InfoBarPosition, ToolTipFilter, ToolTipPosition, SettingCard, MessageBox, FluentTranslator, IndeterminateProgressBar, SwitchSettingCard, InfoBadgePosition, DotInfoBadge
+from qfluentwidgets import TextBrowser, setThemeColor, ToolButton, TransparentToolButton, FluentIcon, HyperlinkCard, PushSettingCard, ComboBoxSettingCard, SubtitleLabel, OptionsSettingCard, isDarkTheme, InfoBar, InfoBarPosition, ToolTipFilter, ToolTipPosition, SettingCard, MessageBox, FluentTranslator, IndeterminateProgressBar, SwitchSettingCard, InfoBadgePosition, DotInfoBadge, ScrollArea
 from winrt.windows.ui.viewmanagement import UISettings, UIColorType
 import pyaudio
 import time
@@ -257,6 +257,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(QCoreApplication.translate("MainWindow", "Eustoma"))
         self.setWindowIcon(QIcon(os.path.join(res_dir, "resource", "assets", "icon.ico")))
         self.setGeometry(100,100,1318,720)
+        self.setMinimumSize(625, 774)
         self.setup_theme()
         self.center()
         self.model = None
@@ -440,7 +441,7 @@ class MainWindow(QMainWindow):
         self.card_device = SettingCard(
             icon=FluentIcon.DEVELOPER_TOOLS,
             title=QCoreApplication.translate("MainWindow", "Available CUDA devices"),
-            content=QCoreApplication.translate("MainWindow", f"{', '.join([gpu.name for gpu in GPUtil.getGPUs() if 'NVIDIA' in gpu.name])}" if GPUtil.getGPUs() and any('NVIDIA' in gpu.name for gpu in GPUtil.getGPUs()) else "No CUDA device detected.")
+            content=QCoreApplication.translate("MainWindow", f"{', '.join([gpu.name for gpu in GPUtil.getGPUs() if 'NVIDIA' in gpu.name])}" if GPUtil.getGPUs() and any('NVIDIA' in gpu.name for gpu in GPUtil.getGPUs()) else QCoreApplication.translate("MainWindow","No CUDA device detected."))
         )
 
         card_layout.addWidget(self.card_device, alignment=Qt.AlignmentFlag.AlignTop)
@@ -471,7 +472,7 @@ class MainWindow(QMainWindow):
             text=QCoreApplication.translate("MainWindow","Remove"),
             icon=FluentIcon.BROOM,
             title=QCoreApplication.translate("MainWindow","Remove model"),
-            content=QCoreApplication.translate("MainWindow", "Delete currently selected model"),
+            content=QCoreApplication.translate("MainWindow", "Delete currently selected model. Currently selected: <b>{}</b>").format(cfg.get(cfg.model).value),
         )
 
         card_layout.addWidget(self.card_deletemodel, alignment=Qt.AlignmentFlag.AlignTop)
@@ -488,7 +489,7 @@ class MainWindow(QMainWindow):
 
         self.card_keep_output = SwitchSettingCard(
             icon=FluentIcon.FONT,
-            title=QCoreApplication.translate("MainWindow","Keep output text"),
+            title=QCoreApplication.translate("MainWindow","Keep previous text"),
             content=QCoreApplication.translate("MainWindow","Do not clear the previous transcription"),
             configItem=cfg.saveoutput
         )
@@ -504,7 +505,7 @@ class MainWindow(QMainWindow):
         )
 
         card_layout.addWidget(self.card_setlanguage, alignment=Qt.AlignmentFlag.AlignTop)
-        cfg.language.valueChanged.connect(self.langinfo)
+        cfg.language.valueChanged.connect(self.restartinfo)
 
         self.card_theme = OptionsSettingCard(
             cfg.themeMode,
@@ -517,6 +518,20 @@ class MainWindow(QMainWindow):
         card_layout.addWidget(self.card_theme, alignment=Qt.AlignmentFlag.AlignTop)
         self.card_theme.optionChanged.connect(self.theme_changed.emit)
 
+        self.card_zoom = OptionsSettingCard(
+            cfg.dpiScale,
+            FluentIcon.ZOOM,
+            QCoreApplication.translate("MainWindow","Interface zoom"),
+            QCoreApplication.translate("MainWindow","Change the size of widgets and fonts"),
+            texts=[
+                "100%", "125%", "150%", "175%", "200%",
+                QCoreApplication.translate("MainWindow","Follow System Settings")
+            ]
+        )
+
+        card_layout.addWidget(self.card_zoom, alignment=Qt.AlignmentFlag.AlignTop)
+        cfg.dpiScale.valueChanged.connect(self.restartinfo)
+
         self.card_ab = HyperlinkCard(
             url="https://github.com/icosane/eustoma",
             text="Github",
@@ -524,14 +539,21 @@ class MainWindow(QMainWindow):
             title=QCoreApplication.translate("MainWindow", "About"),
             content=QCoreApplication.translate("MainWindow", "Speech to text app, powered by SYSTRAN's faster-whisper and zhiyiYo's QFluentWidgets")
         )
-        card_layout.addWidget(self.card_ab, alignment=Qt.AlignmentFlag.AlignTop)
+        card_layout.addWidget(self.card_ab,  alignment=Qt.AlignmentFlag.AlignTop )
+
+        self.scroll_area = ScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+
+        self.card_widget = QWidget()
+        self.card_widget.setLayout(card_layout)
+        self.scroll_area.setWidget(self.card_widget)
+        settings_layout.addWidget(self.scroll_area)
 
         self.download_progressbar = IndeterminateProgressBar()
-        card_layout.addWidget(self.download_progressbar, alignment=Qt.AlignmentFlag.AlignTop)
+        settings_layout.addWidget(self.download_progressbar )
         self.download_progressbar.hide()
-
-        settings_layout.addLayout(card_layout)
-        card_layout.addStretch()
 
         settings_widget = QWidget()
         settings_widget.setLayout(settings_layout)
@@ -646,13 +668,13 @@ class MainWindow(QMainWindow):
     def updmicstatus(self):
         QTimer.singleShot(1000, self.audio_handler.mic_connection_check)
 
-    def langinfo(self):
-        InfoBar.success(
+    def restartinfo(self):
+        InfoBar.warning(
             title=(QCoreApplication.translate("MainWindow", "Success")),
             content=(QCoreApplication.translate("MainWindow", "Setting takes effect after restart")),
             orient=Qt.Orientation.Horizontal,
             isClosable=True,
-            position=InfoBarPosition.BOTTOM_RIGHT,
+            position=InfoBarPosition.TOP_RIGHT,
             duration=2000,
             parent=window
         )
@@ -662,14 +684,16 @@ class MainWindow(QMainWindow):
         setThemeColor(main_color_hex)
         if isDarkTheme():
             self.setStyleSheet("""
-                QMainWindow {
+                QWidget {
                     background-color: #1e1e1e;  /* Dark background */
+                    border: none;
                 }
             """)
         else:
             self.setStyleSheet("""
-                QMainWindow {
+                QWidget {
                     background-color: #f0f0f0;  /* Light background */
+                    border: none;
                 }
             """)
 
@@ -846,6 +870,10 @@ class MainWindow(QMainWindow):
 
 
 if __name__ == "__main__":
+    if cfg.get(cfg.dpiScale) != "Auto":
+        os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "0"
+        os.environ["QT_SCALE_FACTOR"] = str(cfg.get(cfg.dpiScale))
+
     app = QApplication(sys.argv)
     app.setStyle("Fusion")  # Set the Fusion style for QFluentWidgets
     locale = cfg.get(cfg.language).value

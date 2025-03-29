@@ -1,4 +1,4 @@
-from PyQt6.QtCore import QThread, pyqtSignal
+from PyQt6.QtCore import QThread, pyqtSignal, QCoreApplication
 import os
 from faster_whisper import download_model
 from ctranslate2 import get_cuda_device_count
@@ -35,17 +35,20 @@ def model_downloader(main_window):
 
 def update_model(main_window):
     model_name = cfg.get(cfg.model).value
+    content = QCoreApplication.translate("MainWindow", "Delete currently selected model. Currently selected: <b>{}</b>").format(cfg.get(cfg.model).value)
 
     # Ensure record_button is updated
     if model_name == 'None':
         main_window.update_record_button(False)
         main_window.update_remove_button(False)
+        main_window.card_deletemodel.setContent(content)
         main_window.settings_badge.show()
         main_window.show_badge = True
     else:
         model_downloader(main_window)
         main_window.update_record_button(True)
         main_window.update_remove_button(True)
+        main_window.card_deletemodel.setContent(content)
         main_window.show_badge = False
         main_window.settings_badge.hide()
 
