@@ -455,7 +455,7 @@ class MainWindow(QMainWindow):
         )
 
         card_layout.addWidget(self.card_setdevice, alignment=Qt.AlignmentFlag.AlignTop)
-        cfg.model.valueChanged.connect(self.device_changed.emit)
+        cfg.device.valueChanged.connect(self.device_changed.emit)
 
         self.card_setmodel = ComboBoxSettingCard(
             configItem=cfg.model,
