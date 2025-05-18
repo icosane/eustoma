@@ -253,7 +253,6 @@ class MainWindow(QMainWindow):
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
-        self.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint)
         self.setWindowTitle(QCoreApplication.translate("MainWindow", "Eustoma"))
         self.setWindowIcon(QIcon(os.path.join(res_dir, "resource", "assets", "icon.ico")))
         self.setGeometry(100,100,1318,720)
@@ -284,6 +283,11 @@ class MainWindow(QMainWindow):
         self.layout_settings()
 
         QTimer.singleShot(100, self.init_check)
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        self.raise_()
+        self.activateWindow()
 
     def mic_check(self,s):
         if not s:
