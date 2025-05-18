@@ -5,7 +5,6 @@ winrt-Windows.UI.ViewManagement==2.3.0
 faster-whisper==1.1.1
 PyQt6-Fluent-Widgets[full]==1.7.6
 PyQt6==6.8.1
-GPUtil==1.4.0
 psutil==7.0.0
 nvidia-cuda-runtime-cu12==12.6.77,
 nvidia-cublas-cu12==12.6.4.1,

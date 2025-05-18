@@ -9,8 +9,8 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="main.py" line="749"/>
-        <location filename="main.py" line="721"/>
+        <location filename="main.py" line="767"/>
+        <location filename="main.py" line="739"/>
         <location filename="main.py" line="291"/>
         <source>Warning</source>
         <translation>Внимание</translation>
@@ -21,7 +21,7 @@
         <translation>&lt;b&gt;Микрофон не обнаружен&lt;/b&gt;. Убедитесь, что микрофон подключен и включен.</translation>
     </message>
     <message>
-        <location filename="main.py" line="584"/>
+        <location filename="main.py" line="602"/>
         <location filename="main.py" line="331"/>
         <location filename="main.py" line="316"/>
         <source>Information</source>
@@ -38,7 +38,7 @@
         <translation>&lt;b&gt;В вашем компьютере отсутствует видеокарта NVIDIA&lt;/b&gt;. Пожалуйста, перейдите в раздел «Настройки» и переключите устройство на &lt;b&gt;cpu&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="main.py" line="666"/>
+        <location filename="main.py" line="684"/>
         <location filename="main.py" line="351"/>
         <source>Waiting for input. To start press the play button.</source>
         <translation>Ожидание ввода. Чтобы начать, нажмите кнопку воспроизведения.</translation>
@@ -69,207 +69,225 @@
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="main.py" line="443"/>
-        <source>Available CUDA devices</source>
-        <translation>Доступные устройства CUDA</translation>
+        <location filename="main.py" line="441"/>
+        <source>Devices</source>
+        <translation>Устройства</translation>
     </message>
     <message>
-        <location filename="main.py" line="444"/>
-        <source>No CUDA device detected.</source>
-        <translation>Устройство CUDA не обнаружено.</translation>
-    </message>
-    <message>
-        <location filename="main.py" line="452"/>
+        <location filename="main.py" line="448"/>
         <source>Device</source>
         <translation>Устройство</translation>
     </message>
     <message>
-        <location filename="main.py" line="453"/>
+        <location filename="main.py" line="449"/>
         <source>Select device. cpu will utilize your CPU, cuda will only work on NVIDIA graphics card.</source>
         <translation>Выберите устройство. cpu работает на CPU, cuda работает только на видеокартах NVIDIA.</translation>
     </message>
     <message>
         <location filename="main.py" line="463"/>
+        <source>Model management</source>
+        <translation>Управление моделями</translation>
+    </message>
+    <message>
+        <location filename="main.py" line="471"/>
         <source>Model</source>
         <translation>Модель</translation>
     </message>
     <message>
-        <location filename="main.py" line="464"/>
+        <location filename="main.py" line="472"/>
         <source>Change whisper model</source>
         <translation>Изменить модель whisper</translation>
     </message>
     <message>
-        <location filename="main.py" line="472"/>
+        <location filename="main.py" line="480"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="main.py" line="474"/>
+        <location filename="main.py" line="482"/>
         <source>Remove model</source>
         <translation>Удалить модель</translation>
     </message>
     <message>
-        <location filename="main.py" line="475"/>
+        <location filename="main.py" line="483"/>
         <source>Delete currently selected model. Currently selected: &lt;b&gt;{}&lt;/b&gt;</source>
         <translation>Удалить текущую модель. Текущая модель: &lt;b&gt;{}&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="main.py" line="483"/>
+        <location filename="main.py" line="489"/>
+        <source>Text options</source>
+        <translation>Параметры текста</translation>
+    </message>
+    <message>
+        <location filename="main.py" line="496"/>
         <source>Continuous text</source>
         <translation>Непрерывный текст</translation>
     </message>
     <message>
-        <location filename="main.py" line="484"/>
+        <location filename="main.py" line="497"/>
         <source>Click to switch between separate lines for each sentence and a continuous flow of text.</source>
         <translation>Нажмите, чтобы переключаться между отдельными строками для каждого предложения и непрерывным текстом.</translation>
     </message>
     <message>
-        <location filename="main.py" line="492"/>
+        <location filename="main.py" line="505"/>
         <source>Keep previous text</source>
         <translation>Сохранять предыдущий текст</translation>
     </message>
     <message>
-        <location filename="main.py" line="493"/>
+        <location filename="main.py" line="506"/>
         <source>Do not clear the previous transcription</source>
         <translation>Не очищать предыдущую расшифровку</translation>
     </message>
     <message>
-        <location filename="main.py" line="502"/>
+        <location filename="main.py" line="512"/>
+        <source>Miscellaneous</source>
+        <translation>Прочее</translation>
+    </message>
+    <message>
+        <location filename="main.py" line="520"/>
         <source>Language</source>
         <translation>Язык</translation>
     </message>
     <message>
-        <location filename="main.py" line="503"/>
+        <location filename="main.py" line="521"/>
         <source>Change UI language</source>
         <translation>Изменить язык интерфейса</translation>
     </message>
     <message>
-        <location filename="main.py" line="513"/>
+        <location filename="main.py" line="531"/>
         <source>Application theme</source>
         <translation>Тема приложения</translation>
     </message>
     <message>
-        <location filename="main.py" line="514"/>
+        <location filename="main.py" line="532"/>
         <source>Adjust how the application looks</source>
         <translation>Настройка внешнего вида приложения</translation>
     </message>
     <message>
-        <location filename="main.py" line="515"/>
+        <location filename="main.py" line="533"/>
         <source>Light</source>
         <translation>Светлая</translation>
     </message>
     <message>
-        <location filename="main.py" line="515"/>
+        <location filename="main.py" line="533"/>
         <source>Dark</source>
         <translation>Тёмная</translation>
     </message>
     <message>
-        <location filename="main.py" line="528"/>
-        <location filename="main.py" line="515"/>
+        <location filename="main.py" line="546"/>
+        <location filename="main.py" line="533"/>
         <source>Follow System Settings</source>
         <translation>Системная</translation>
     </message>
     <message>
-        <location filename="main.py" line="524"/>
+        <location filename="main.py" line="542"/>
         <source>Interface zoom</source>
         <translation>Масштаб интерфейса</translation>
     </message>
     <message>
-        <location filename="main.py" line="525"/>
+        <location filename="main.py" line="543"/>
         <source>Change the size of widgets and fonts</source>
         <translation>Изменение размера виджетов и шрифтов</translation>
     </message>
     <message>
-        <location filename="main.py" line="539"/>
+        <location filename="main.py" line="557"/>
         <source>About</source>
         <translation>О программе</translation>
     </message>
     <message>
-        <location filename="main.py" line="540"/>
+        <location filename="main.py" line="558"/>
         <source>Speech to text app, powered by SYSTRAN&apos;s faster-whisper and zhiyiYo&apos;s QFluentWidgets</source>
         <translation>Приложение для преобразования речи в текст, работающее на базе faster-whisper от SYSTRAN и QFluentWidgets от zhiyiYo</translation>
     </message>
     <message>
-        <location filename="main.py" line="585"/>
+        <location filename="main.py" line="603"/>
         <source>Model download started. Please wait for it to finish</source>
         <translation>Загрузка модели началась. Пожалуйста, подождите, пока она завершится</translation>
     </message>
     <message>
-        <location filename="main.py" line="773"/>
-        <location filename="main.py" line="735"/>
-        <location filename="main.py" line="673"/>
-        <location filename="main.py" line="634"/>
-        <location filename="main.py" line="599"/>
+        <location filename="main.py" line="791"/>
+        <location filename="main.py" line="753"/>
+        <location filename="main.py" line="691"/>
+        <location filename="main.py" line="652"/>
+        <location filename="main.py" line="617"/>
         <source>Success</source>
         <translation>Успешно</translation>
     </message>
     <message>
-        <location filename="main.py" line="600"/>
+        <location filename="main.py" line="618"/>
         <source>Model successfully downloaded</source>
         <translation>Модель успешно загружена</translation>
     </message>
     <message>
-        <location filename="main.py" line="783"/>
-        <location filename="main.py" line="644"/>
-        <location filename="main.py" line="612"/>
+        <location filename="main.py" line="801"/>
+        <location filename="main.py" line="662"/>
+        <location filename="main.py" line="630"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="main.py" line="635"/>
+        <location filename="main.py" line="653"/>
         <source>Model removed</source>
         <translation>Модель удалена</translation>
     </message>
     <message>
-        <location filename="main.py" line="674"/>
+        <location filename="main.py" line="692"/>
         <source>Setting takes effect after restart</source>
         <translation>Настройка вступит в силу после перезапуска программы</translation>
     </message>
     <message>
-        <location filename="main.py" line="750"/>
-        <location filename="main.py" line="722"/>
+        <location filename="main.py" line="768"/>
+        <location filename="main.py" line="740"/>
         <source>The text browser is empty!</source>
         <translation>Окно не содержит текст!</translation>
     </message>
     <message>
-        <location filename="main.py" line="736"/>
+        <location filename="main.py" line="754"/>
         <source>Text copied to clipboard!</source>
         <translation>Текст скопирован в буфер обмена!</translation>
     </message>
     <message>
-        <location filename="main.py" line="761"/>
+        <location filename="main.py" line="779"/>
         <source>Save File</source>
         <translation>Сохранить файл</translation>
     </message>
     <message>
-        <location filename="main.py" line="763"/>
+        <location filename="main.py" line="781"/>
         <source>Text Files (*.txt)</source>
         <translation>Текстовые файлы (*.txt)</translation>
     </message>
     <message>
-        <location filename="main.py" line="774"/>
+        <location filename="main.py" line="792"/>
         <source>Text saved to file!</source>
         <translation>Текст сохранен в файл!</translation>
     </message>
     <message>
-        <location filename="main.py" line="808"/>
+        <location filename="main.py" line="826"/>
         <source>Recording...</source>
         <translation>Идет запись...</translation>
     </message>
     <message>
-        <location filename="main.py" line="824"/>
+        <location filename="main.py" line="842"/>
         <source>Loading model into memory...</source>
         <translation>Загрузка модели в память...</translation>
     </message>
     <message>
-        <location filename="main.py" line="837"/>
+        <location filename="main.py" line="855"/>
         <source>Transcribing audio...</source>
         <translation>Расшифровка аудиофайла...</translation>
     </message>
     <message>
-        <location filename="main.py" line="866"/>
+        <location filename="main.py" line="884"/>
         <source>Audio saved, starting transcription...</source>
         <translation>Аудиофайл сохранен, начинаем расшифровку...</translation>
+    </message>
+    <message>
+        <source>Available CUDA devices</source>
+        <translation type="vanished">Доступные устройства CUDA</translation>
+    </message>
+    <message>
+        <source>No CUDA device detected.</source>
+        <translation type="vanished">Устройство CUDA не обнаружено.</translation>
     </message>
     <message>
         <source>Keep output text</source>

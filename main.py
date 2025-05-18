@@ -3,14 +3,13 @@ from PyQt6.QtGui import QFont, QColor, QIcon, QShortcut, QKeySequence
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QStackedWidget, QFileDialog
 from PyQt6.QtCore import Qt, QObject, pyqtSignal, QThread, QMutex, pyqtSlot, QTranslator, QCoreApplication, QTimer
 sys.stdout = open(os.devnull, 'w')
-from qfluentwidgets import TextBrowser, setThemeColor, ToolButton, TransparentToolButton, FluentIcon, HyperlinkCard, PushSettingCard, ComboBoxSettingCard, SubtitleLabel, OptionsSettingCard, isDarkTheme, InfoBar, InfoBarPosition, ToolTipFilter, ToolTipPosition, SettingCard, MessageBox, FluentTranslator, IndeterminateProgressBar, SwitchSettingCard, InfoBadgePosition, DotInfoBadge, ScrollArea
+from qfluentwidgets import TextBrowser, setThemeColor, ToolButton, TransparentToolButton, FluentIcon, HyperlinkCard, PushSettingCard, ComboBoxSettingCard, SubtitleLabel, OptionsSettingCard, isDarkTheme, InfoBar, InfoBarPosition, ToolTipFilter, ToolTipPosition, SettingCard, MessageBox, FluentTranslator, IndeterminateProgressBar, SwitchSettingCard, InfoBadgePosition, DotInfoBadge, ScrollArea, StrongBodyLabel
 from winrt.windows.ui.viewmanagement import UISettings, UIColorType
 import pyaudio
 import time
 import numpy as np
 from resource.config import cfg
 from resource.model_utils import update_model, update_device
-import GPUtil
 import gc
 import shutil
 import traceback
@@ -254,6 +253,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
+        self.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint)
         self.setWindowTitle(QCoreApplication.translate("MainWindow", "Eustoma"))
         self.setWindowIcon(QIcon(os.path.join(res_dir, "resource", "assets", "icon.ico")))
         self.setGeometry(100,100,1318,720)
@@ -438,13 +438,9 @@ class MainWindow(QMainWindow):
         back_button_layout.addWidget(self.settings_title, alignment=Qt.AlignmentFlag.AlignTop)
 
         card_layout = QVBoxLayout()
-        self.card_device = SettingCard(
-            icon=FluentIcon.DEVELOPER_TOOLS,
-            title=QCoreApplication.translate("MainWindow", "Available CUDA devices"),
-            content=QCoreApplication.translate("MainWindow", f"{', '.join([gpu.name for gpu in GPUtil.getGPUs() if 'NVIDIA' in gpu.name])}" if GPUtil.getGPUs() and any('NVIDIA' in gpu.name for gpu in GPUtil.getGPUs()) else QCoreApplication.translate("MainWindow","No CUDA device detected."))
-        )
-
-        card_layout.addWidget(self.card_device, alignment=Qt.AlignmentFlag.AlignTop)
+        self.devices_title = StrongBodyLabel(QCoreApplication.translate("MainWindow", "Devices"))
+        self.devices_title.setTextColor(QColor(0, 0, 0), QColor(255, 255, 255))
+        card_layout.addWidget(self.devices_title, alignment=Qt.AlignmentFlag.AlignTop)
 
         self.card_setdevice = ComboBoxSettingCard(
             configItem=cfg.device,
@@ -455,7 +451,19 @@ class MainWindow(QMainWindow):
         )
 
         card_layout.addWidget(self.card_setdevice, alignment=Qt.AlignmentFlag.AlignTop)
+
+        if get_cuda_device_count() == 0:
+            self.card_setdevice.hide()
+            self.devices_title.hide()
+            if cfg.get(cfg.device).value == 'cuda':
+                cfg.set(cfg.device, 'cpu')
+        
         cfg.device.valueChanged.connect(self.device_changed.emit)
+
+        self.modelsins_title = StrongBodyLabel(QCoreApplication.translate("MainWindow", "Model management"))
+        self.modelsins_title.setTextColor(QColor(0, 0, 0), QColor(255, 255, 255))
+        card_layout.addSpacing(20)
+        card_layout.addWidget(self.modelsins_title, alignment=Qt.AlignmentFlag.AlignTop)
 
         self.card_setmodel = ComboBoxSettingCard(
             configItem=cfg.model,
@@ -478,6 +486,11 @@ class MainWindow(QMainWindow):
         card_layout.addWidget(self.card_deletemodel, alignment=Qt.AlignmentFlag.AlignTop)
         self.card_deletemodel.clicked.connect(self.modelremover)
 
+        self.switches_title = StrongBodyLabel(QCoreApplication.translate("MainWindow", "Text options"))
+        self.switches_title.setTextColor(QColor(0, 0, 0), QColor(255, 255, 255))
+        card_layout.addSpacing(20)
+        card_layout.addWidget(self.switches_title, alignment=Qt.AlignmentFlag.AlignTop)
+
         self.card_switch_line_format = SwitchSettingCard(
             icon=FluentIcon.FONT_SIZE,
             title=QCoreApplication.translate("MainWindow","Continuous text"),
@@ -495,6 +508,11 @@ class MainWindow(QMainWindow):
         )
 
         card_layout.addWidget(self.card_keep_output, alignment=Qt.AlignmentFlag.AlignTop)
+
+        self.miscellaneous_title = StrongBodyLabel(QCoreApplication.translate("MainWindow", "Miscellaneous"))
+        self.miscellaneous_title.setTextColor(QColor(0, 0, 0), QColor(255, 255, 255))
+        card_layout.addSpacing(20)
+        card_layout.addWidget(self.miscellaneous_title, alignment=Qt.AlignmentFlag.AlignTop)
 
         self.card_setlanguage = ComboBoxSettingCard(
             configItem=cfg.language,
