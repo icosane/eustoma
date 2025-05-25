@@ -54,7 +54,7 @@ Or open the extracted folder in [Visual Studio Code](https://code.visualstudio.c
 ## Usage
 
 1. **First Launch**: When you launch the app for the first time, navigate to the Settings and download the model you wish to use.
-2. **Device Configuration**: If you have an NVIDIA GPU (you can verify this at the top of the **Settings**), set the Device option to ```cuda```.
+2. **Device Configuration**: If you have an NVIDIA GPU (you can verify this by checking if you have **Device** option at the top of the **Settings**), set the Device option to ```cuda```.
 3. **Recording**: On the main screen, press the **Play** button to start recording. Press it again to stop recording and transcribe the audio.
 4. **Text Management**: You can copy the transcribed text to the clipboard or save it as a .txt file using the buttons located next to the **Settings** button.
 
