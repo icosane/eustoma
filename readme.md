@@ -14,6 +14,14 @@ It was developed specifically for a family member, and as such, it is provided a
 - **Fully Local**: The application operates completely offline after downloading the whisper model.
 
 
+## Screenshots
+<div style="display: flex; flex-direction: column;">
+    <img src="./assets/1.png" alt="ui" style="margin-right: 10px;" />
+    <img src="./assets/2.png" alt="ui" style="margin-right: 10px;"/>
+    <img src="./assets/3.png" alt="ui" style="margin-right: 10px;"/>
+</div>
+
+
 ## Getting Started
 
 ### Prerequisites
@@ -64,8 +72,15 @@ Or open the extracted folder in [Visual Studio Code](https://code.visualstudio.c
 - ```Delete``` to clear text field
 - ```Spacebar``` to start/stop recording
 
+## License
+
+This project is licensed under the **GNU General Public License v3.0 (GPLv3)**.  
+See the [LICENSE](./LICENSE) file for details.
+
 
 ## Acknowledgments
+
+Third-party libraries are used under their respective licenses; see their packages’ license files.
 
 - [faster-whisper](https://github.com/SYSTRAN/faster-whisper)
 - [QFluentWidgets](https://github.com/zhiyiYo/PyQt-Fluent-Widgets)
@@ -80,10 +95,3 @@ Or open the extracted folder in [Visual Studio Code](https://code.visualstudio.c
 - [GPUtil](https://github.com/anderskm/gputil)
 - [PyInstaller](https://pyinstaller.org/)
 - [flower icons](https://www.flaticon.com/free-icon/jasmine_2926745) - Flower icons created by Triberion - Flaticon
-
-## Screenshots
-<div style="display: flex; flex-direction: column;">
-    <img src="./assets/1.png" alt="ui" style="margin-right: 10px;" />
-    <img src="./assets/2.png" alt="ui" style="margin-right: 10px;"/>
-    <img src="./assets/3.png" alt="ui" style="margin-right: 10px;"/>
-</div>
